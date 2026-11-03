@@ -3,7 +3,6 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 import { BrowserRouter, Route, Routes } from "react-router-dom"
-import DasboardProfile from './Componentes/DasboardProfile.tsx'
 import ProtecterRouter from './Componentes/ProtecterRouter.tsx'
 import Dashboard from './Componentes/Dashboard.tsx'
 import Layout from './Componentes/Narbar.tsx'
@@ -12,7 +11,6 @@ import { GlovalProvider } from './context/GlobalProvider.tsx'
 import InicarSession from './Componentes/InicarSession.tsx'
 import AdminZone from './Componentes/AdminZone.tsx'
 import TableComponents from "./Componentes/TableComponents.tsx"
-import { ChartExample } from './Componentes/DashboardBook.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -20,10 +18,10 @@ createRoot(document.getElementById('root')!).render(
       <GlovalProvider>
         <Routes>
           <Route element={<Layout />}>
-            <Route path='/' element={<App />} ></Route>
-            <Route path='/user/:titulo' element={<SingleUser />} ></Route>
+            <Route path='/' element={<App />} />
+            <Route path='/user/:titulo' element={<SingleUser />} />
           </Route>
-          <Route path='/login' element={<InicarSession></InicarSession>} ></Route>
+          <Route path='/login' element={<InicarSession />} />
           <Route
             path="/adminZone"
             element={
@@ -32,12 +30,12 @@ createRoot(document.getElementById('root')!).render(
               </ProtecterRouter>
             }
           >
+            <Route index element={<Dashboard />} />
+            <Route path="dashboard" element={<Dashboard />} />
             <Route path="libros" element={<TableComponents />} />
-            <Route path="dashboard" element={<ChartExample />} />
           </Route>
         </Routes>
       </GlovalProvider>
     </BrowserRouter>
-
   </StrictMode>,
 )
