@@ -44,7 +44,7 @@ export const GlovalProvider = ({ children }: ChildrenNOde) => {
         setUser(null)
     }
 
-    const backendBase = import.meta.env.VITE_APP_BACKEND_BASE || 'http://localhost:3001'
+    const backendBase = import.meta.env.VITE_APP_BACKEND_BASE || 'https://biblioteca-xbi5.onrender.com'
 
     return (
         <GlobalCenter.Provider value={{
