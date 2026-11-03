@@ -32,8 +32,9 @@ export function DialogDemo({ UserChangue, onSuccess }: PropsBroks) {
         titulo: UserChangue?.titulo || '',
         autor: UserChangue?.autor || '',
         genero: UserChangue?.genero || '',
-        anio: UserChangue?.anio || 2000,
-        paginas: UserChangue?.paginas || 100
+        anio: UserChangue?.anio || 2020,
+        paginas: UserChangue?.paginas || 100,
+        portada: UserChangue?.portada || ''
     })
 
     useEffect(() => {
@@ -42,8 +43,9 @@ export function DialogDemo({ UserChangue, onSuccess }: PropsBroks) {
                 titulo: UserChangue.titulo || '',
                 autor: UserChangue.autor || '',
                 genero: UserChangue.genero || '',
-                anio: UserChangue.anio || 2000,
-                paginas: UserChangue.paginas || 100
+                anio: UserChangue.anio || 2020,
+                paginas: UserChangue.paginas || 100,
+                portada: UserChangue.portada || ''
             })
         }
     }, [UserChangue])
@@ -91,14 +93,14 @@ export function DialogDemo({ UserChangue, onSuccess }: PropsBroks) {
                     <MdEdit size={18} />
                 </Button>
             } />
-            <DialogContent className="sm:max-w-md bg-white">
+            <DialogContent className="sm:max-w-lg bg-white max-h-[90vh] overflow-y-auto">
                 <form onSubmit={handleSubmit}>
                     <DialogHeader>
                         <DialogTitle className="text-xl font-bold text-gray-800">
                             Editar Libro #{UserChangue?.id}
                         </DialogTitle>
                         <DialogDescription>
-                            Modifica los campos del libro y guarda los cambios en la base de datos.
+                            Modifica los campos del libro o actualiza el enlace de su portada.
                         </DialogDescription>
                     </DialogHeader>
 
@@ -110,7 +112,7 @@ export function DialogDemo({ UserChangue, onSuccess }: PropsBroks) {
 
                     <FieldGroup className="space-y-3 my-4">
                         <Field>
-                            <Label htmlFor={`titulo-${UserChangue?.id}`}>Título</Label>
+                            <Label htmlFor={`titulo-${UserChangue?.id}`}>Título del Libro</Label>
                             <Input
                                 id={`titulo-${UserChangue?.id}`}
                                 name="titulo"
@@ -121,7 +123,7 @@ export function DialogDemo({ UserChangue, onSuccess }: PropsBroks) {
                         </Field>
 
                         <Field>
-                            <Label htmlFor={`autor-${UserChangue?.id}`}>Autor</Label>
+                            <Label htmlFor={`autor-${UserChangue?.id}`}>Autor / Editorial</Label>
                             <Input
                                 id={`autor-${UserChangue?.id}`}
                                 name="autor"
@@ -132,12 +134,13 @@ export function DialogDemo({ UserChangue, onSuccess }: PropsBroks) {
                         </Field>
 
                         <Field>
-                            <Label htmlFor={`genero-${UserChangue?.id}`}>Género</Label>
+                            <Label htmlFor={`genero-${UserChangue?.id}`}>Área / Género / Colección</Label>
                             <Input
                                 id={`genero-${UserChangue?.id}`}
                                 name="genero"
                                 value={form.genero}
                                 onChange={handleChange}
+                                placeholder="Ej: Atlas y Geografía del Perú, CTA, Matemática..."
                                 required
                             />
                         </Field>
@@ -167,11 +170,42 @@ export function DialogDemo({ UserChangue, onSuccess }: PropsBroks) {
                                 />
                             </Field>
                         </div>
+
+                        <Field>
+                            <Label htmlFor={`portada-${UserChangue?.id}`}>Enlace de la Portada (URL)</Label>
+                            <Input
+                                id={`portada-${UserChangue?.id}`}
+                                name="portada"
+                                value={form.portada}
+                                onChange={handleChange}
+                                placeholder="https://ejemplo.com/portada.jpg"
+                            />
+                            <p className="text-[11px] text-gray-500 mt-1">
+                                Pega aquí el enlace de la imagen o foto del libro.
+                            </p>
+                        </Field>
+
+                        {form.portada && (
+                            <div className="flex items-center gap-3 p-2 bg-slate-50 border rounded-lg">
+                                <img 
+                                    src={form.portada} 
+                                    alt="Vista previa" 
+                                    className="w-12 h-16 object-cover rounded shadow-sm border"
+                                    onError={(e) => {
+                                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400&q=80'
+                                    }}
+                                />
+                                <div className="text-xs text-gray-600">
+                                    <p className="font-semibold">Vista previa de la portada</p>
+                                    <p className="text-[10px] text-gray-400 truncate max-w-xs">{form.portada}</p>
+                                </div>
+                            </div>
+                        )}
                     </FieldGroup>
 
                     <DialogFooter className="mt-4 flex justify-end gap-2">
                         <DialogClose render={<Button type="button" variant="outline">Cancelar</Button>} />
-                        <Button type="submit" disabled={cargando} className="bg-blue-600 hover:bg-blue-700 text-white">
+                        <Button type="submit" disabled={cargando} className="bg-blue-600 hover:bg-blue-700 text-white cursor-pointer">
                             {cargando ? 'Guardando...' : 'Guardar Cambios'}
                         </Button>
                     </DialogFooter>
