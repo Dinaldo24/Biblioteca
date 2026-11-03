@@ -14,6 +14,7 @@ import { DialogDemo } from "./Modal"
 import type { PropsDetalle } from "./../assets/Data"
 import { DeleteDemon } from "./DeleteDemon"
 import { CreateDialogDemon } from "./CreateFromUser"
+import { CambiarPasswordModal } from "./CambiarPasswordModal"
 import { GlobalCenter } from "../context/GlobalProvider"
 import { GetallBook } from "../helpers/llamada"
 import { Input } from "../components/ui/input"
@@ -72,9 +73,12 @@ const TableComponents = () => {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-800">Gestión de Libros</h1>
-                    <p className="text-sm text-gray-500">Panel administrativo: agregar, editar o eliminar libros en la base de datos SQL Server.</p>
+                    <p className="text-sm text-gray-500">Panel administrativo: agregar, editar o eliminar libros en la base de datos PostgreSQL.</p>
                 </div>
-                <CreateDialogDemon onSuccess={getall} />
+                <div className="flex items-center gap-3">
+                    <CambiarPasswordModal />
+                    <CreateDialogDemon onSuccess={getall} />
+                </div>
             </div>
 
             <div className="mb-4 max-w-sm">

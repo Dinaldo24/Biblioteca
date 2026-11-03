@@ -40,7 +40,7 @@ const FormSession = () => {
         }
         localStorage.setItem('usuario_biblioteca', JSON.stringify(sessionData))
         setUser(sessionData)
-        navigate('/adminZone/dashboard')
+        navigate('/adminZone/libros')
       } else {
         setError(data.mensaje || 'Credenciales incorrectas')
       }

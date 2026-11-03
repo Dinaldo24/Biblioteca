@@ -6,7 +6,6 @@ import { FaGlobe } from "react-icons/fa"
 import { NavLink, Outlet, Link } from "react-router-dom"
 
 const Tags = [
-    { nombre: 'dashboard', label: 'Dashboard', icono: <MdSpaceDashboard className="text-lg" /> },
     { nombre: 'libros', label: 'Gestión de Libros', icono: <IoBookSharp className="text-lg" /> },
 ]
 

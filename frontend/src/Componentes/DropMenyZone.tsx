@@ -35,9 +35,6 @@ export function DropdownMenuDemo() {
             <DropdownMenuContent className="w-48" align="end">
                 <DropdownMenuGroup>
                     <DropdownMenuLabel>Mi Cuenta ({user?.username})</DropdownMenuLabel>
-                    <DropdownMenuItem onClick={() => navigate('/adminZone/dashboard')}>
-                        Dashboard
-                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate('/adminZone/libros')}>
                         Gestión de Libros
                     </DropdownMenuItem>

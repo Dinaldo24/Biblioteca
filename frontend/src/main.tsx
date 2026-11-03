@@ -4,7 +4,6 @@ import './index.css'
 import App from './App.tsx'
 import { BrowserRouter, Route, Routes } from "react-router-dom"
 import ProtecterRouter from './Componentes/ProtecterRouter.tsx'
-import Dashboard from './Componentes/Dashboard.tsx'
 import Layout from './Componentes/Narbar.tsx'
 import SingleUser from './Componentes/SingleUser.tsx'
 import { GlovalProvider } from './context/GlobalProvider.tsx'
@@ -30,8 +29,7 @@ createRoot(document.getElementById('root')!).render(
               </ProtecterRouter>
             }
           >
-            <Route index element={<Dashboard />} />
-            <Route path="dashboard" element={<Dashboard />} />
+            <Route index element={<TableComponents />} />
             <Route path="libros" element={<TableComponents />} />
           </Route>
         </Routes>
