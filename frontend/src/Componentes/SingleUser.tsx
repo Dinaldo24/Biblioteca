@@ -1,65 +1,68 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import type { PropsDetalle } from "../assets/Data"
+import { libros } from "../assets/Data"
 import { GlobalCenter } from '../context/GlobalProvider'
 import { Button } from '../components/ui/button'
-import { FaBook } from "react-icons/fa";
-import { Spinner } from '../components/ui/spinner'
-import { FaLongArrowAltLeft } from "react-icons/fa";
-
-
-
-
+import { FaBook, FaLongArrowAltLeft } from "react-icons/fa"
 
 const SingleUser = () => {
-
-    let navigate = useNavigate()
-    const Redirect = () => {
-
-        navigate('/index')
-    }
+    const navigate = useNavigate()
+    const { titulo } = useParams<{ titulo: string }>()
     const { variable } = useContext(GlobalCenter) as { variable: PropsDetalle }
+
+    // Si variable global no está cargada (ej: recarga de página), buscar por título
+    const libroSeleccionado: PropsDetalle = (variable && variable.titulo) 
+        ? variable 
+        : (libros.find(l => l.titulo.toLowerCase() === decodeURIComponent(titulo || '').toLowerCase()) || libros[0])
+
+    const Redirect = () => {
+        navigate('/')
+    }
+
     return (
-        <>
-            {
-                Object.values(variable).length === 0 ? <Spinner></Spinner> :
-                    <div className='border min-h-screen h-screen flex items-center justify-center  '>
-                        <div className='border-gray-100 w-[60%] grid grid-cols-2  relative justify-around rounded-sm bg-[#f6fbfd] shadow-2xl   min-h-[70%]'>
-                            <div className='relative  '>
-                                <p className='font-stretch-semi-condensed    m-2 text-4xl decoration-2 mb-4'>{variable.titulo}</p>
-                                <FaBook className='absolute top-3 right-4 text-2xl '></FaBook>
-                                <p className='mx-2  rounded-sm mt-2'> <span className='text-gray-600'>Autor</span> :{variable.autor}</p>
-                                < p className='mx-2   rounded-sm mt-2'> <span className='text-gray-600'>Genero</span> :  {variable.genero}</p>
-                                <p className='mx-2   rounded-sm mt-2' > <span className='text-gray-600'>Paginas</span> : {variable.paginas}</p>
-                                <p className='text-balance mx-2 mt-2'>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Doloremque rerum accusantium, architecto qui omnis dolorum incidunt consequuntur nobis praesentium explicabo corporis odio repellendus veritatis repudiandae, et commodi autem labore ex.</p>
-                                <Button variant={'outline'} className="mx-2 mt-2 cursor-pointer"> Libro</Button>
-                                <hr className='my-5'></hr>
-                                <div className=' w-full flex mx-2'>
-                                    <Button className={"min-w-[70px]  mx-2"} variant={'outline'}  >Ver</Button>
-                                    <Button className={"min-w-[70px] mx-2"} variant={'outline'}  >triller</Button>
-                                    <Button className={"min-w-[70px] mx-2"} variant={'outline'}  >199</Button>
-                                    <Button className={"min-w-[70px]"} variant={'outline'}  >Osasco</Button>
-                                </div>
-                                <div className=' min-h-[100px] 
-                        w-full h-14 bg-linear-to-r from-blue-400 rounded-sm to-blue-100 absolute bottom-0 w-[100%]'>
-                                </div>
-                                <div>
-                                </div>
-                            </div>
-                            <div style={{
-                                backgroundImage: `url(https://cdn.culturagenial.com/es/imagenes/el-principito-portada-cke.jpg?class=article)`,
-                                backgroundRepeat: 'no-repeat',
-                                backgroundSize: 'cover'
-                            }} className='p-2 rounded-md hover:'>
-                            </div>
+        <div className='min-h-screen bg-slate-100 flex items-center justify-center p-4 relative'>
+            <button 
+                onClick={Redirect} 
+                className='absolute top-6 left-6 flex items-center gap-2 bg-white border border-slate-300 text-slate-700 px-4 py-2 rounded-lg shadow-sm hover:bg-slate-50 cursor-pointer font-medium transition-all'>
+                <FaLongArrowAltLeft /> Volver al Catálogo
+            </button>
+
+            <div className='bg-white rounded-2xl shadow-xl max-w-4xl w-full grid grid-cols-1 md:grid-cols-2 overflow-hidden border border-slate-200'>
+                <div className='p-8 flex flex-col justify-between'>
+                    <div>
+                        <div className='flex items-center gap-3 text-indigo-600 mb-2'>
+                            <FaBook className='text-2xl' />
+                            <span className='text-sm font-bold uppercase tracking-wider'>{libroSeleccionado.genero}</span>
                         </div>
-                        <FaLongArrowAltLeft onClick={Redirect} className='absolute top-20 right-20 text-2xl p-1  bg-linear-to-r  from-gray-500 via-gray-900 to-black .  text-gray-200 cursor-pointer border h-10 w-10 rounded-full bg-black' ></FaLongArrowAltLeft>
+                        <h1 className='text-3xl font-bold text-slate-900 mb-4'>{libroSeleccionado.titulo}</h1>
+                        
+                        <div className='space-y-2 text-slate-700 mb-6'>
+                            <p><strong className='text-slate-900'>Autor:</strong> {libroSeleccionado.autor}</p>
+                            <p><strong className='text-slate-900'>Año de publicación:</strong> {libroSeleccionado.anio}</p>
+                            <p><strong className='text-slate-900'>Páginas:</strong> {libroSeleccionado.paginas}</p>
+                        </div>
 
+                        <p className='text-slate-600 text-sm leading-relaxed mb-6'>
+                            Obra clásica disponible en nuestro catálogo de la biblioteca. Puedes consultarlo o solicitar préstamo con el administrador.
+                        </p>
                     </div>
-            }
 
+                    <div className='pt-4 border-t border-slate-100 flex gap-3'>
+                        <Button onClick={Redirect} className='bg-indigo-600 hover:bg-indigo-700 text-white cursor-pointer'>
+                            Ver más libros
+                        </Button>
+                    </div>
+                </div>
 
-        </>
+                <div 
+                    className='min-h-[350px] bg-slate-200 bg-cover bg-center'
+                    style={{
+                        backgroundImage: `url(https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=1000&auto=format&fit=crop)`
+                    }}
+                />
+            </div>
+        </div>
     )
 }
 

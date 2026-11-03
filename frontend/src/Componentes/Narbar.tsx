@@ -20,7 +20,7 @@ const Layout = () => {
                     onClick={() => navigate('/')} 
                     className="flex items-center gap-2 cursor-pointer text-xl font-bold hover:text-indigo-400 transition-colors">
                     <FaBook className="text-indigo-400" />
-                    <span>BibliotecaApp</span>
+                    <span>Biblioteca</span>
                 </div>
 
                 <div className='flex items-center gap-3'>
