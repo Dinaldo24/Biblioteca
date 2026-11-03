@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from "react"
+import React, { createContext, useState } from "react"
 import type { PropsDetalle } from "../../src/assets/Data"
 
 export interface UserSession {
@@ -11,7 +11,7 @@ export interface UserSession {
 
 export interface PropsDetllae {
     variable: PropsDetalle
-    setVariableGlobal: React.Dispatch<React.SetStateAction<PropsDetalle>>;
+    setVariableGlobal: React.Dispatch<React.SetStateAction<PropsDetalle>>
     backurl: string
     authurl: string
     totalPages: number
@@ -19,6 +19,11 @@ export interface PropsDetllae {
     user: UserSession | null
     setUser: (user: UserSession | null) => void
     logout: () => void
+    filtroBusqueda: string
+    setFiltroBusqueda: (s: string) => void
+    filtroGenero: string
+    setFiltroGenero: (s: string) => void
+    limpiarFiltros: () => void
 }
 
 export const GlobalCenter = createContext<PropsDetllae>({} as PropsDetllae)
@@ -30,6 +35,9 @@ interface ChildrenNOde {
 export const GlovalProvider = ({ children }: ChildrenNOde) => {
     const [variable, setVariableGlobal] = useState({} as PropsDetalle)
     const [totalPages, setTotalPages] = useState<number>(0)
+    const [filtroBusqueda, setFiltroBusqueda] = useState<string>('')
+    const [filtroGenero, setFiltroGenero] = useState<string>('')
+
     const [user, setUser] = useState<UserSession | null>(() => {
         try {
             const saved = localStorage.getItem('usuario_biblioteca')
@@ -44,6 +52,11 @@ export const GlovalProvider = ({ children }: ChildrenNOde) => {
         setUser(null)
     }
 
+    const limpiarFiltros = () => {
+        setFiltroBusqueda('')
+        setFiltroGenero('')
+    }
+
     const backendBase = import.meta.env.VITE_APP_BACKEND_BASE || 'https://biblioteca-xbi5.onrender.com'
 
     return (
@@ -56,7 +69,12 @@ export const GlovalProvider = ({ children }: ChildrenNOde) => {
             setTotalPages,
             user,
             setUser,
-            logout
+            logout,
+            filtroBusqueda,
+            setFiltroBusqueda,
+            filtroGenero,
+            setFiltroGenero,
+            limpiarFiltros
         }}>
             {children}
         </GlobalCenter.Provider>

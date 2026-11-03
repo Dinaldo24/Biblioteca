@@ -6,28 +6,36 @@ import { FaBook, FaUserShield, FaSignOutAlt, FaSignInAlt } from 'react-icons/fa'
 
 const Layout = () => {
     const navigate = useNavigate()
-    const { user, logout } = useContext(GlobalCenter)
+    const { user, logout, limpiarFiltros } = useContext(GlobalCenter)
+
+    const irAlCatalogo = () => {
+        if (limpiarFiltros) limpiarFiltros()
+        navigate('/')
+    }
 
     const handleLogout = () => {
         logout()
-        navigate('/')
+        irAlCatalogo()
     }
 
     return (
         <div>
             <header className='w-full bg-slate-900 text-white px-6 py-3 shadow-md flex items-center justify-between'>
                 <div 
-                    onClick={() => navigate('/')} 
-                    className="flex items-center gap-2 cursor-pointer text-xl font-bold hover:text-indigo-400 transition-colors">
+                    onClick={irAlCatalogo} 
+                    className="flex items-center gap-2 cursor-pointer text-xl font-bold hover:text-indigo-400 transition-colors"
+                    title="Ir al inicio de la Biblioteca"
+                >
                     <FaBook className="text-indigo-400" />
                     <span>Biblioteca</span>
                 </div>
 
                 <div className='flex items-center gap-3'>
                     <Button 
-                        onClick={() => navigate('/')} 
+                        onClick={irAlCatalogo} 
                         variant="ghost" 
-                        className="text-white hover:bg-slate-800 cursor-pointer">
+                        className="text-white hover:bg-slate-800 cursor-pointer"
+                    >
                         Catálogo
                     </Button>
 
@@ -35,7 +43,8 @@ const Layout = () => {
                         <>
                             <Button 
                                 onClick={() => navigate('/adminZone/libros')} 
-                                className="bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-2 cursor-pointer">
+                                className="bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-2 cursor-pointer"
+                            >
                                 <FaUserShield /> Panel Admin
                             </Button>
                             <span className="text-xs text-gray-300 hidden sm:inline">
@@ -45,14 +54,16 @@ const Layout = () => {
                                 onClick={handleLogout} 
                                 variant="outline" 
                                 size="sm" 
-                                className="text-red-400 border-red-500 hover:bg-red-950/50 flex items-center gap-1 cursor-pointer">
+                                className="text-red-400 border-red-500 hover:bg-red-950/50 flex items-center gap-1 cursor-pointer"
+                            >
                                 <FaSignOutAlt /> Salir
                             </Button>
                         </>
                     ) : (
                         <Button 
                             onClick={() => navigate('/login')} 
-                            className="bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-2 cursor-pointer">
+                            className="bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-2 cursor-pointer"
+                        >
                             <FaSignInAlt /> Iniciar Sesión (Admin)
                         </Button>
                     )}

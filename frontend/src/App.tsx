@@ -4,65 +4,71 @@ import { Button } from './components/ui/button'
 import { Input } from './components/ui/input'
 import { CardDemo } from './Componentes/Card'
 import type { PropsDetalle } from './assets/Data'
-import { libros } from "./assets/Data"
+import { libros as librosEstaticos } from "./assets/Data"
 import { GlobalCenter } from "./context/GlobalProvider"
 import { ComboboxBasic } from './Componentes/Selected'
 import { FiltroPaginas } from './components/Filtros/SliderFilter'
-import { IoGrid } from "react-icons/io5"
+import { IoGrid, IoCloseCircleOutline } from "react-icons/io5"
 import { GetallBook } from './helpers/llamada'
 
 function App() {  
-  const [Libro, setLibro] = useState<PropsDetalle[]>(libros)
-  const { setVariableGlobal, backurl } = useContext(GlobalCenter)
-  const [input, setinput] = useState('')
-  const [filtroImagnes, setFiltroImages] = useState('')
-  const [sliderFilter, setSliderFilter] = useState<number[]>([])
+  const [Libro, setLibro] = useState<PropsDetalle[]>(librosEstaticos)
+  const { 
+    setVariableGlobal, 
+    backurl, 
+    filtroBusqueda, 
+    setFiltroBusqueda, 
+    filtroGenero, 
+    setFiltroGenero, 
+    limpiarFiltros 
+  } = useContext(GlobalCenter)
 
-  const handleChanuge = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setinput(e.target.value)
-  }
+  const [sliderFilter, setSliderFilter] = useState<number[]>([])
 
   const NumeroTodoAstro = (item: PropsDetalle) => {
     setVariableGlobal(item)
   }
 
-  const listaActual = Array.isArray(Libro) ? Libro : []
+  const listaActual = Array.isArray(Libro) && Libro.length > 0 ? Libro : librosEstaticos
 
-  const FilterUser = listaActual.length > 0 ?
-    listaActual.filter((item) => item.titulo?.toLocaleLowerCase().includes(input.toLocaleLowerCase()))
-    : listaActual
+  // Obtener categorías dinámicas únicas
+  const categorias = Array.from(
+    new Set(listaActual.map((item) => item.genero).filter(Boolean))
+  ).sort()
 
-  const filtroPorGenero = filtroImagnes !== '' ? FilterUser.filter((item) => {
-    if (filtroImagnes === 'todos') {
-      return true
+  const normalizar = (str: string) =>
+    (str || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .trim()
+
+  // Filtrado inteligente que tolera acentos, mayúsculas y coincidencias parciales
+  const librosMostrados = listaActual.filter((item) => {
+    // 1. Filtro por texto en el buscador
+    const texto = normalizar(filtroBusqueda)
+    const coincideTexto =
+      !texto ||
+      normalizar(item.titulo).includes(texto) ||
+      normalizar(item.autor).includes(texto) ||
+      normalizar(item.genero).includes(texto)
+
+    // 2. Filtro por categoría seleccionada
+    const cat = normalizar(filtroGenero)
+    const coincideGenero =
+      !cat ||
+      cat === 'todos' ||
+      normalizar(item.genero).includes(cat) ||
+      cat.includes(normalizar(item.genero))
+
+    // 3. Filtro por páginas (slider)
+    let coincidePaginas = true
+    if (sliderFilter && sliderFilter.length === 2 && sliderFilter[0] > 0 && sliderFilter[1] > 0) {
+      coincidePaginas = item.paginas >= sliderFilter[0] && item.paginas <= sliderFilter[1]
     }
-    return item.genero === filtroImagnes
-  }) : FilterUser
 
-  const hanldeChanngueComboxBox = (value: string) => {
-    setFiltroImages(value)
-  }
-
-  const changueSliderFilter = (value: number[]) => {
-    setSliderFilter(value)
-  }
-
-  const CangueGrid = () => {
-    // grid toggle
-  }
-
-  const handleChanugeSlider = () => {
-    if (!sliderFilter || sliderFilter.length === 0) {
-      return filtroPorGenero
-    }
-
-    const [min, max] = sliderFilter
-    if (min > 0 && max > 0) {
-      return filtroPorGenero.filter((item) => item.paginas >= min && item.paginas <= max)
-    }
-
-    return filtroPorGenero
-  }  
+    return coincideTexto && coincideGenero && coincidePaginas
+  })
 
   const EfectoDetalle = async () => {
     try {
@@ -70,11 +76,11 @@ function App() {
       if (Array.isArray(data) && data.length > 0) {
         setLibro(data)
       } else {
-        setLibro(libros)
+        setLibro(librosEstaticos)
       }
     } catch (error) {
       console.log('Error conectando al backend, usando datos locales:', error)
-      setLibro(libros)
+      setLibro(librosEstaticos)
     } 
   }
 
@@ -82,35 +88,67 @@ function App() {
     EfectoDetalle()
   }, [backurl])
 
-  const librosMostrados = handleChanugeSlider()
+  const hayFiltrosActivos = Boolean(filtroBusqueda || filtroGenero || (sliderFilter.length === 2 && sliderFilter[0] > 0))
+
+  const handleLimpiarTodo = () => {
+    limpiarFiltros()
+    setSliderFilter([])
+  }
 
   return (
     <div className='min-h-screen bg-slate-50'>
-      <div className='w-[80%] md:w-container mx-auto pt-6 p-1'>
+      <div className='w-[85%] md:w-container mx-auto pt-6 p-1'>
+        {/* Barra de búsqueda por texto */}
         <Input 
-          onChange={handleChanuge} 
-          className='p-2 mt-3 shadow-md bg-white border-slate-300' 
-          placeholder='Buscar libro por título...' 
+          value={filtroBusqueda}
+          onChange={(e) => setFiltroBusqueda(e.target.value)} 
+          className='p-3 mt-3 shadow-sm bg-white border-slate-300 rounded-xl text-sm' 
+          placeholder='Buscar libro por título, autor o tema...' 
         />
-        <div className='flex flex-wrap items-center gap-3 mt-5'>
-          <Button onClick={CangueGrid} variant={'outline'} className='cursor-pointer'>
-            <IoGrid />
-          </Button>
-          <ComboboxBasic changue={hanldeChanngueComboxBox} />
-          <FiltroPaginas onChange={changueSliderFilter} />
+
+        {/* Barra de controles y filtros */}
+        <div className='flex flex-wrap items-center gap-3 mt-4'>
+          <ComboboxBasic 
+            valor={filtroGenero} 
+            onChange={setFiltroGenero} 
+            categorias={categorias} 
+          />
+          <FiltroPaginas onChange={setSliderFilter} />
+
+          {hayFiltrosActivos && (
+            <button
+              onClick={handleLimpiarTodo}
+              className='flex items-center gap-1.5 px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold rounded-lg transition cursor-pointer'
+            >
+              <IoCloseCircleOutline className="text-base" /> Limpiar Filtros
+            </button>
+          )}
         </div>
       </div>
+
       <hr className='my-4 border-slate-200' />
+
       <div className='w-[90vw] flex items-center justify-center mx-auto pb-12'>
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 mt-6'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 mt-4 w-full max-w-7xl'>
           {librosMostrados.length > 0 ? (
             librosMostrados.map((item, index) => (
               <CardDemo key={item.id ?? index} NumeroTodoAstro={NumeroTodoAstro} item={item} />
             ))
           ) : (
-            <p className='font-bold text-slate-500 py-10 col-span-3 text-center'>
-              No se encontraron resultados
-            </p>
+            <div className='col-span-full text-center py-16 bg-white rounded-2xl border border-slate-200 p-8 shadow-sm my-6'>
+              <p className='text-xl font-bold text-slate-800 mb-2'>
+                No se encontraron libros con los filtros seleccionados
+              </p>
+              <p className='text-sm text-slate-500 mb-6'>
+                Prueba buscando otro título o seleccionando otra categoría.
+              </p>
+              <button
+                onClick={handleLimpiarTodo}
+                className='px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-sm transition shadow cursor-pointer'
+              >
+                Ver Todos los Libros
+              </button>
+            </div>
           )}
         </div>
       </div>
