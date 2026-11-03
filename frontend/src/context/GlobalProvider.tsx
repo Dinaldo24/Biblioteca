@@ -44,12 +44,14 @@ export const GlovalProvider = ({ children }: ChildrenNOde) => {
         setUser(null)
     }
 
+    const backendBase = import.meta.env.VITE_APP_BACKEND_BASE || 'http://localhost:3001'
+
     return (
         <GlobalCenter.Provider value={{
             variable,
             setVariableGlobal,
-            backurl: 'http://localhost:3001/libros',
-            authurl: 'http://localhost:3001/auth',
+            backurl: `${backendBase}/libros`,
+            authurl: `${backendBase}/auth`,
             totalPages,
             setTotalPages,
             user,
