@@ -46,7 +46,7 @@ const FormSession = () => {
       }
     } catch (err) {
       console.error(err)
-      setError('Error al conectar con el servidor backend en http://localhost:3001')
+      setError(`Error al conectar con el servidor backend (${authurl})`)
     } finally {
       setCargando(false)
     }
