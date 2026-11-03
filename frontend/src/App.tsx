@@ -98,9 +98,6 @@ function App() {
           </Button>
           <ComboboxBasic changue={hanldeChanngueComboxBox} />
           <FiltroPaginas onChange={changueSliderFilter} />
-          <p className='ml-auto text-sm font-semibold text-slate-600'>
-            Total: {librosMostrados.length} libros
-          </p>
         </div>
       </div>
       <hr className='my-4 border-slate-200' />

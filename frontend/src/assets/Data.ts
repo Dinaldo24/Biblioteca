@@ -468,5 +468,187 @@ export const libros: PropsDetalle[] = [
         anio: 2019,
         paginas: 84,
         portada: "https://images.unsplash.com/photo-1577896851231-70ef18881754?w=500&q=80"
+    },
+
+    // --- COLECCIÓN: LITERATURA CLÁSICA Y UNIVERSAL ---
+    {
+        id: 50,
+        titulo: "Cien años de soledad",
+        autor: "Gabriel García Márquez",
+        genero: "Realismo mágico",
+        anio: 1967,
+        paginas: 417,
+        portada: "https://m.media-amazon.com/images/I/71W4hV0d8pL._AC_UF1000,1000_QL80_.jpg"
+    },
+    {
+        id: 51,
+        titulo: "1984",
+        autor: "George Orwell",
+        genero: "Distopía",
+        anio: 1949,
+        paginas: 328,
+        portada: "https://m.media-amazon.com/images/I/71kxa1-0mfL._AC_UF1000,1000_QL80_.jpg"
+    },
+    {
+        id: 52,
+        titulo: "Don Quijote de la Mancha",
+        autor: "Miguel de Cervantes",
+        genero: "Novela",
+        anio: 1605,
+        paginas: 863,
+        portada: "https://m.media-amazon.com/images/I/91R8f8hX2TL._AC_UF1000,1000_QL80_.jpg"
+    },
+    {
+        id: 53,
+        titulo: "El principito",
+        autor: "Antoine de Saint-Exupéry",
+        genero: "Fantasía",
+        anio: 1943,
+        paginas: 96,
+        portada: "https://cdn.culturagenial.com/es/imagenes/el-principito-portada-cke.jpg?class=article"
+    },
+    {
+        id: 54,
+        titulo: "Harry Potter y la piedra filosofal",
+        autor: "J. K. Rowling",
+        genero: "Fantasía",
+        anio: 1997,
+        paginas: 309,
+        portada: "https://m.media-amazon.com/images/I/81ibfYk4qmL._AC_UF1000,1000_QL80_.jpg"
+    },
+    {
+        id: 55,
+        titulo: "El Hobbit",
+        autor: "J. R. R. Tolkien",
+        genero: "Fantasía",
+        anio: 1937,
+        paginas: 310,
+        portada: "https://m.media-amazon.com/images/I/81k7U0u5+ML._AC_UF1000,1000_QL80_.jpg"
+    },
+    {
+        id: 56,
+        titulo: "Orgullo y prejuicio",
+        autor: "Jane Austen",
+        genero: "Romance",
+        anio: 1813,
+        paginas: 432,
+        portada: "https://m.media-amazon.com/images/I/71Q1tPupKjL._AC_UF1000,1000_QL80_.jpg"
+    },
+    {
+        id: 57,
+        titulo: "Crimen y castigo",
+        autor: "Fiódor Dostoyevski",
+        genero: "Drama",
+        anio: 1866,
+        paginas: 671,
+        portada: "https://m.media-amazon.com/images/I/71wdbKi4DSL._AC_UF1000,1000_QL80_.jpg"
+    },
+    {
+        id: 58,
+        titulo: "La metamorfosis",
+        autor: "Franz Kafka",
+        genero: "Ficción",
+        anio: 1915,
+        paginas: 96,
+        portada: "https://m.media-amazon.com/images/I/71R2c3R8fLL._AC_UF1000,1000_QL80_.jpg"
+    },
+    {
+        id: 59,
+        titulo: "El nombre del viento",
+        autor: "Patrick Rothfuss",
+        genero: "Fantasía",
+        anio: 2007,
+        paginas: 662,
+        portada: "https://m.media-amazon.com/images/I/91b8fS+hNUL._AC_UF1000,1000_QL80_.jpg"
+    },
+    {
+        id: 60,
+        titulo: "La sombra del viento",
+        autor: "Carlos Ruiz Zafón",
+        genero: "Misterio",
+        anio: 2001,
+        paginas: 576,
+        portada: "https://m.media-amazon.com/images/I/71KkI3yUj4L._AC_UF1000,1000_QL80_.jpg"
+    },
+    {
+        id: 61,
+        titulo: "Sapiens",
+        autor: "Yuval Noah Harari",
+        genero: "Historia",
+        anio: 2011,
+        paginas: 496,
+        portada: "https://m.media-amazon.com/images/I/713jIoMO3UL._AC_UF1000,1000_QL80_.jpg"
+    },
+    {
+        id: 62,
+        titulo: "El código Da Vinci",
+        autor: "Dan Brown",
+        genero: "Misterio",
+        anio: 2003,
+        paginas: 689,
+        portada: "https://m.media-amazon.com/images/I/815WERNsdtL._AC_UF1000,1000_QL80_.jpg"
+    },
+    {
+        id: 63,
+        titulo: "Los juegos del hambre",
+        autor: "Suzanne Collins",
+        genero: "Distopía",
+        anio: 2008,
+        paginas: 374,
+        portada: "https://m.media-amazon.com/images/I/61I24wOsn8L._AC_UF1000,1000_QL80_.jpg"
+    },
+    {
+        id: 64,
+        titulo: "El alquimista",
+        autor: "Paulo Coelho",
+        genero: "Ficción",
+        anio: 1988,
+        paginas: 208,
+        portada: "https://m.media-amazon.com/images/I/71aFt4+OTOL._AC_UF1000,1000_QL80_.jpg"
+    },
+    {
+        id: 65,
+        titulo: "It",
+        autor: "Stephen King",
+        genero: "Terror",
+        anio: 1986,
+        paginas: 1138,
+        portada: "https://m.media-amazon.com/images/I/71d5F0g1aEL._AC_UF1000,1000_QL80_.jpg"
+    },
+    {
+        id: 66,
+        titulo: "Drácula",
+        autor: "Bram Stoker",
+        genero: "Terror",
+        anio: 1897,
+        paginas: 418,
+        portada: "https://m.media-amazon.com/images/I/81zN5aV+uTL._AC_UF1000,1000_QL80_.jpg"
+    },
+    {
+        id: 67,
+        titulo: "El retrato de Dorian Gray",
+        autor: "Oscar Wilde",
+        genero: "Ficción",
+        anio: 1890,
+        paginas: 254,
+        portada: "https://m.media-amazon.com/images/I/71L2tI792bL._AC_UF1000,1000_QL80_.jpg"
+    },
+    {
+        id: 68,
+        titulo: "Viaje al centro de la Tierra",
+        autor: "Julio Verne",
+        genero: "Aventura",
+        anio: 1864,
+        paginas: 384,
+        portada: "https://m.media-amazon.com/images/I/81M6bLgYQ0L._AC_UF1000,1000_QL80_.jpg"
+    },
+    {
+        id: 69,
+        titulo: "Fahrenheit 451",
+        autor: "Ray Bradbury",
+        genero: "Distopía",
+        anio: 1953,
+        paginas: 256,
+        portada: "https://m.media-amazon.com/images/I/61N8q7Qn0ZL._AC_UF1000,1000_QL80_.jpg"
     }
 ]

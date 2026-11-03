@@ -107,6 +107,66 @@ public class AuthController {
         return ResponseEntity.ok(resp);
     }
 
+    @PostMapping("/editar-perfil")
+    public ResponseEntity<Map<String, Object>> editarPerfil(@RequestBody Map<String, String> payload) {
+        Map<String, Object> resp = new HashMap<>();
+        String currentUsername = payload.get("currentUsername");
+        String newUsername = payload.get("newUsername");
+        String newNombre = payload.get("newNombre");
+        String actualPassword = payload.get("actualPassword");
+        String nuevaPassword = payload.get("nuevaPassword");
+
+        if (currentUsername == null || actualPassword == null) {
+            resp.put("exito", false);
+            resp.put("mensaje", "Usuario y contraseña actual requeridos");
+            return ResponseEntity.badRequest().body(resp);
+        }
+
+        Optional<Usuario> usuarioOpt = usuarioRepository.findByUsername(currentUsername);
+        if (usuarioOpt.isEmpty()) {
+            resp.put("exito", false);
+            resp.put("mensaje", "Usuario no encontrado");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(resp);
+        }
+
+        Usuario usuario = usuarioOpt.get();
+        if (!usuario.getPassword().equals(actualPassword)) {
+            resp.put("exito", false);
+            resp.put("mensaje", "La contraseña actual no es correcta");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resp);
+        }
+
+        if (newUsername != null && !newUsername.isBlank() && !newUsername.equals(currentUsername)) {
+            if (usuarioRepository.existsByUsername(newUsername.trim())) {
+                resp.put("exito", false);
+                resp.put("mensaje", "El nuevo nombre de usuario ya está ocupado");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resp);
+            }
+            usuario.setUsername(newUsername.trim());
+        }
+
+        if (newNombre != null && !newNombre.isBlank()) {
+            usuario.setNombre(newNombre.trim());
+        }
+
+        if (nuevaPassword != null && !nuevaPassword.isBlank()) {
+            if (nuevaPassword.trim().length() < 3) {
+                resp.put("exito", false);
+                resp.put("mensaje", "La nueva contraseña debe tener al menos 3 caracteres");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resp);
+            }
+            usuario.setPassword(nuevaPassword.trim());
+        }
+
+        usuarioRepository.save(usuario);
+
+        resp.put("exito", true);
+        resp.put("mensaje", "¡Perfil actualizado exitosamente!");
+        resp.put("username", usuario.getUsername());
+        resp.put("nombre", usuario.getNombre());
+        return ResponseEntity.ok(resp);
+    }
+
     @GetMapping("/usuarios")
     public ResponseEntity<List<Usuario>> listarUsuarios() {
         return ResponseEntity.ok(usuarioRepository.findAll());

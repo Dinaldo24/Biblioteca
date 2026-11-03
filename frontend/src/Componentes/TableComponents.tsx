@@ -2,9 +2,7 @@ import React, { useContext, useEffect, useState } from "react"
 import {
     Table,
     TableBody,
-    TableCaption,
     TableCell,
-    TableFooter,
     TableHead,
     TableHeader,
     TableRow,
@@ -12,9 +10,9 @@ import {
 import PaginationZone from "./PaginationZone"
 import { DialogDemo } from "./Modal"
 import type { PropsDetalle } from "./../assets/Data"
+import { libros as librosFallback } from "./../assets/Data"
 import { DeleteDemon } from "./DeleteDemon"
 import { CreateDialogDemon } from "./CreateFromUser"
-import { CambiarPasswordModal } from "./CambiarPasswordModal"
 import { GlobalCenter } from "../context/GlobalProvider"
 import { GetallBook } from "../helpers/llamada"
 import { Input } from "../components/ui/input"
@@ -33,7 +31,7 @@ const TableComponents = () => {
     const { backurl } = useContext(GlobalCenter)
     const [Paginumber, setPaginatioNumber] = useState(incioDetalle)
     const [Tags, setTags] = useState(0)
-    const [estado, setestado] = useState<Array<PropsDetalle>>([])
+    const [estado, setestado] = useState<Array<PropsDetalle>>(librosFallback)
     const [busqueda, setBusqueda] = useState("")
 
     let skip = 10
@@ -49,18 +47,23 @@ const TableComponents = () => {
     const getall = () => {
         try {
             GetallBook(backurl).then((data) => {
-                if (data && Array.isArray(data)) {
+                if (data && Array.isArray(data) && data.length > 0) {
                     setestado(data)
+                } else {
+                    setestado(librosFallback)
                 }
+            }).catch(() => {
+                setestado(librosFallback)
             })
         } catch (error) {
             console.error("Error al obtener libros:", error)
+            setestado(librosFallback)
         }
     }
 
     useEffect(() => {
         getall()
-    }, [])
+    }, [backurl])
 
     const librosFiltrados = estado.filter(item =>
         item.titulo?.toLowerCase().includes(busqueda.toLowerCase()) ||
@@ -73,12 +76,8 @@ const TableComponents = () => {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-800">Gestión de Libros</h1>
-                    <p className="text-sm text-gray-500">Panel administrativo: agregar, editar o eliminar libros en la base de datos PostgreSQL.</p>
                 </div>
-                <div className="flex items-center gap-3">
-                    <CambiarPasswordModal />
-                    <CreateDialogDemon onSuccess={getall} />
-                </div>
+                <CreateDialogDemon onSuccess={getall} />
             </div>
 
             <div className="mb-4 max-w-sm">
@@ -86,13 +85,12 @@ const TableComponents = () => {
                     placeholder="Buscar libro por título, autor o género..."
                     value={busqueda}
                     onChange={(e) => setBusqueda(e.target.value)}
-                    className="p-2 border rounded-md"
+                    className="p-2 border rounded-md bg-white shadow-sm"
                 />
             </div>
 
             <div className="border rounded-lg overflow-hidden bg-white shadow-sm">
                 <Table>
-                    <TableCaption>Catálogo de libros en SQL Server</TableCaption>
                     <TableHeader>
                         <TableRow className="bg-gray-50">
                             <TableHead className="w-16 font-bold">ID</TableHead>
@@ -108,7 +106,7 @@ const TableComponents = () => {
                         {librosFiltrados.length === 0 ? (
                             <TableRow>
                                 <TableCell colSpan={7} className="text-center py-8 text-gray-500">
-                                    No se encontraron libros en la base de datos.
+                                    No se encontraron libros.
                                 </TableCell>
                             </TableRow>
                         ) : (
@@ -134,14 +132,6 @@ const TableComponents = () => {
                             ))
                         )}
                     </TableBody>
-                    <TableFooter>
-                        <TableRow>
-                            <TableCell colSpan={5} className="font-semibold">Total de libros</TableCell>
-                            <TableCell colSpan={2} className="text-right font-bold text-indigo-600">
-                                {librosFiltrados.length} registros
-                            </TableCell>
-                        </TableRow>
-                    </TableFooter>
                 </Table>
             </div>
 

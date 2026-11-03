@@ -1,9 +1,7 @@
-import { DropdownMenuDemo } from "./DropMenyZone"
 import Viscardo from "../assets/Font/ViscardoAndGuamzn.jpg"
 import { IoBookSharp } from "react-icons/io5"
-import { MdSpaceDashboard } from "react-icons/md"
-import { FaGlobe } from "react-icons/fa"
-import { NavLink, Outlet, Link } from "react-router-dom"
+import { NavLink, Outlet } from "react-router-dom"
+import { AdminProfileSidebar } from "./AdminProfileSidebar"
 
 const Tags = [
     { nombre: 'libros', label: 'Gestión de Libros', icono: <IoBookSharp className="text-lg" /> },
@@ -11,9 +9,9 @@ const Tags = [
 
 const AdminZone = () => {
     return (
-        <div className="min-h-screen grid grid-cols-[64px_1fr] sm:grid-cols-[220px_1fr] bg-slate-50">
-            {/* Sidebar */}
-            <aside className="border-r border-slate-200 bg-white flex flex-col justify-between">
+        <div className="min-h-screen grid grid-cols-[64px_1fr] sm:grid-cols-[230px_1fr] bg-slate-50">
+            {/* Sidebar Izquierda Fija */}
+            <aside className="border-r border-slate-200 bg-white flex flex-col justify-between sticky top-0 h-screen">
                 <div>
                     <div className="flex items-center gap-3 border-b border-slate-200 p-3 bg-slate-50">
                         <img 
@@ -23,11 +21,11 @@ const AdminZone = () => {
                         />
                         <div className="hidden sm:block overflow-hidden">
                             <p className="text-xs font-bold text-slate-800 truncate">Biblioteca</p>
-                            <p className="text-[10px] text-slate-500 truncate">Panel Admin</p>
+                            <p className="text-[10px] text-slate-500 truncate">Colegio J. P. Vizcardo</p>
                         </div>
                     </div>
 
-                    <nav className="p-2 space-y-1">
+                    <nav className="p-2 space-y-1 mt-2">
                         {Tags.map((item, index) => (
                             <NavLink 
                                 to={`/adminZone/${item.nombre}`} 
@@ -47,25 +45,15 @@ const AdminZone = () => {
                     </nav>
                 </div>
 
-                <div className="p-3 border-t border-slate-200">
-                    <Link 
-                        to="/"
-                        className="flex items-center justify-between gap-2 px-3 py-2 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 hover:text-blue-600 transition"
-                    >
-                        <span className="hidden sm:inline">Ver Web Pública</span>
-                        <FaGlobe className="text-sm" />
-                    </Link>
-                </div>
+                {/* Perfil de Usuario fijo en la parte inferior izquierda */}
+                <AdminProfileSidebar />
             </aside>
 
-            {/* Main Content Area */}
+            {/* Área Principal de Contenido */}
             <div className="flex flex-col min-w-0">
-                <header className="flex justify-between items-center px-6 py-3 bg-white border-b border-slate-200">
-                    <div className="text-xs text-slate-400 font-medium hidden sm:block">
+                <header className="flex justify-between items-center px-6 py-3.5 bg-white border-b border-slate-200">
+                    <div className="text-xs text-slate-500 font-medium">
                         Panel de Administración • Sistema de Biblioteca
-                    </div>
-                    <div className="ml-auto">
-                        <DropdownMenuDemo />
                     </div>
                 </header>
 
