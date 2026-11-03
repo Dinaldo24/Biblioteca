@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import type { PropsDetalle } from "../assets/Data"
-import { libros } from "../assets/Data"
+import { libros, obtenerPortada } from "../assets/Data"
 import { GlobalCenter } from '../context/GlobalProvider'
 import { Button } from '../components/ui/button'
 import { FaBook, FaLongArrowAltLeft } from "react-icons/fa"
@@ -11,7 +11,6 @@ const SingleUser = () => {
     const { titulo } = useParams<{ titulo: string }>()
     const { variable } = useContext(GlobalCenter) as { variable: PropsDetalle }
 
-    // Si variable global no está cargada (ej: recarga de página), buscar por título
     const libroSeleccionado: PropsDetalle = (variable && variable.titulo) 
         ? variable 
         : (libros.find(l => l.titulo.toLowerCase() === decodeURIComponent(titulo || '').toLowerCase()) || libros[0])
@@ -19,6 +18,8 @@ const SingleUser = () => {
     const Redirect = () => {
         navigate('/')
     }
+
+    const portadaUrl = obtenerPortada(libroSeleccionado)
 
     return (
         <div className='min-h-screen bg-slate-100 flex items-center justify-center p-4 relative'>
@@ -28,7 +29,7 @@ const SingleUser = () => {
                 <FaLongArrowAltLeft /> Volver al Catálogo
             </button>
 
-            <div className='bg-white rounded-2xl shadow-xl max-w-4xl w-full grid grid-cols-1 md:grid-cols-2 overflow-hidden border border-slate-200'>
+            <div className='bg-white rounded-2xl shadow-xl max-w-4xl w-full grid grid-cols-1 md:grid-cols-2 overflow-hidden border border-slate-200 mt-12 md:mt-0'>
                 <div className='p-8 flex flex-col justify-between'>
                     <div>
                         <div className='flex items-center gap-3 text-indigo-600 mb-2'>
@@ -55,12 +56,16 @@ const SingleUser = () => {
                     </div>
                 </div>
 
-                <div 
-                    className='min-h-[350px] bg-slate-200 bg-cover bg-center'
-                    style={{
-                        backgroundImage: `url(https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=1000&auto=format&fit=crop)`
-                    }}
-                />
+                <div className='min-h-[380px] bg-slate-100 relative overflow-hidden flex items-center justify-center p-4'>
+                    <img 
+                        src={portadaUrl} 
+                        alt={libroSeleccionado.titulo}
+                        className='max-h-[350px] w-auto object-contain rounded-lg shadow-lg'
+                        onError={(e) => {
+                            (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=600&auto=format&fit=crop"
+                        }}
+                    />
+                </div>
             </div>
         </div>
     )

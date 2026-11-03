@@ -30,16 +30,20 @@ public class Libro {
     @Column(nullable = false)
     private Integer paginas;
 
+    @Column(columnDefinition = "TEXT")
+    private String portada; // URL o enlace de la imagen de portada
+
     public Libro() {
     }
 
-    public Libro(Long id, String titulo, String autor, String genero, Integer anio, Integer paginas) {
+    public Libro(Long id, String titulo, String autor, String genero, Integer anio, Integer paginas, String portada) {
         this.id = id;
         this.titulo = titulo;
         this.autor = autor;
         this.genero = genero;
         this.anio = anio;
         this.paginas = paginas;
+        this.portada = portada;
     }
 
     public Long getId() {
@@ -88,5 +92,13 @@ public class Libro {
 
     public void setPaginas(Integer paginas) {
         this.paginas = paginas;
+    }
+
+    public String getPortada() {
+        return portada;
+    }
+
+    public void setPortada(String portada) {
+        this.portada = portada;
     }
 }

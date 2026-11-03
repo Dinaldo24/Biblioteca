@@ -31,7 +31,8 @@ export function CreateDialogDemon({ onSuccess }: PropsCreate) {
         autor: '',
         genero: '',
         anio: new Date().getFullYear(),
-        paginas: 100
+        paginas: 100,
+        portada: ''
     })
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,7 +48,7 @@ export function CreateDialogDemon({ onSuccess }: PropsCreate) {
         setError(null)
 
         if (!form.titulo || !form.autor || !form.genero) {
-            setError('Por favor completa todos los campos requeridos.')
+            setError('Por favor completa los campos obligatorios.')
             return
         }
 
@@ -67,7 +68,8 @@ export function CreateDialogDemon({ onSuccess }: PropsCreate) {
                     autor: '',
                     genero: '',
                     anio: new Date().getFullYear(),
-                    paginas: 100
+                    paginas: 100,
+                    portada: ''
                 })
                 setOpen(false)
                 if (onSuccess) onSuccess()
@@ -94,7 +96,7 @@ export function CreateDialogDemon({ onSuccess }: PropsCreate) {
                     <DialogHeader>
                         <DialogTitle className="text-xl font-bold text-gray-800">Subir Libro a la Biblioteca</DialogTitle>
                         <DialogDescription>
-                            Completa los datos del libro para agregarlo a la base de datos SQL Server.
+                            Completa los datos del libro para guardarlo en la base de datos.
                         </DialogDescription>
                     </DialogHeader>
 
@@ -106,7 +108,7 @@ export function CreateDialogDemon({ onSuccess }: PropsCreate) {
 
                     <FieldGroup className="space-y-3 my-4">
                         <Field>
-                            <Label htmlFor="titulo">Título</Label>
+                            <Label htmlFor="titulo">Título *</Label>
                             <Input
                                 id="titulo"
                                 name="titulo"
@@ -118,7 +120,7 @@ export function CreateDialogDemon({ onSuccess }: PropsCreate) {
                         </Field>
 
                         <Field>
-                            <Label htmlFor="autor">Autor</Label>
+                            <Label htmlFor="autor">Autor *</Label>
                             <Input
                                 id="autor"
                                 name="autor"
@@ -130,20 +132,31 @@ export function CreateDialogDemon({ onSuccess }: PropsCreate) {
                         </Field>
 
                         <Field>
-                            <Label htmlFor="genero">Género</Label>
+                            <Label htmlFor="genero">Género *</Label>
                             <Input
                                 id="genero"
                                 name="genero"
                                 value={form.genero}
                                 onChange={handleChange}
-                                placeholder="Ej: Novela, Realismo mágico"
+                                placeholder="Ej: Novela, Fantasía, Misterio"
                                 required
+                            />
+                        </Field>
+
+                        <Field>
+                            <Label htmlFor="portada">URL de Portada / Imagen (Opcional)</Label>
+                            <Input
+                                id="portada"
+                                name="portada"
+                                value={form.portada}
+                                onChange={handleChange}
+                                placeholder="https://ejemplo.com/portada.jpg"
                             />
                         </Field>
 
                         <div className="grid grid-cols-2 gap-3">
                             <Field>
-                                <Label htmlFor="anio">Año de publicación</Label>
+                                <Label htmlFor="anio">Año</Label>
                                 <Input
                                     id="anio"
                                     name="anio"

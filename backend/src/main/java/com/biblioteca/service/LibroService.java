@@ -37,6 +37,9 @@ public class LibroService {
             libroExistente.setGenero(datosActualizados.getGenero());
             libroExistente.setAnio(datosActualizados.getAnio());
             libroExistente.setPaginas(datosActualizados.getPaginas());
+            if (datosActualizados.getPortada() != null && !datosActualizados.getPortada().isBlank()) {
+                libroExistente.setPortada(datosActualizados.getPortada());
+            }
             return libroRepository.save(libroExistente);
         });
     }
