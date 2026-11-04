@@ -86,7 +86,11 @@ export const AdminProfileSidebar = () => {
                 setNuevaPassword('')
                 setConfirmarPassword('')
             } else {
-                setMensaje({ tipo: 'error', texto: data.mensaje || 'No se pudo actualizar el perfil' })
+                let errorTexto = data?.mensaje
+                if (!errorTexto && resp.status === 404) {
+                    errorTexto = 'El servidor en Render aún no ha desplegado la última versión. Haz clic en "Manual Deploy" en Render para actualizarlo.'
+                }
+                setMensaje({ tipo: 'error', texto: errorTexto || 'No se pudo actualizar el perfil' })
             }
         } catch (err) {
             console.error(err)
