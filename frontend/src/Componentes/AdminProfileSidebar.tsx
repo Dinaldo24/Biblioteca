@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { GlobalCenter } from '../context/GlobalProvider'
 import { useNavigate } from 'react-router-dom'
 import { IoEllipsisVertical } from 'react-icons/io5'
@@ -176,9 +177,12 @@ export const AdminProfileSidebar = () => {
             )}
 
             {/* Modal de Editar Perfil */}
-            {modalAbierto && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-                    <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 border border-slate-200">
+            {modalAbierto && createPortal(
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                    <div 
+                        className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 border border-slate-200 relative z-10 text-slate-800"
+                        style={{ backgroundColor: '#ffffff' }}
+                    >
                         <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
                             <div className="flex items-center gap-2 text-slate-800">
                                 <FaUserCircle className="text-xl text-blue-600" />
@@ -220,7 +224,7 @@ export const AdminProfileSidebar = () => {
                                     value={nombre}
                                     onChange={(e) => setNombre(e.target.value)}
                                     placeholder="Nombre del Administrador"
-                                    className="w-full px-3 py-2 rounded-lg text-sm border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-3 py-2 rounded-lg text-sm border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                                 />
                             </div>
 
@@ -234,7 +238,7 @@ export const AdminProfileSidebar = () => {
                                     value={nuevoUsername}
                                     onChange={(e) => setNuevoUsername(e.target.value)}
                                     placeholder="admin"
-                                    className="w-full px-3 py-2 rounded-lg text-sm border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-3 py-2 rounded-lg text-sm border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                                 />
                             </div>
 
@@ -250,7 +254,7 @@ export const AdminProfileSidebar = () => {
                                         value={nuevaPassword}
                                         onChange={(e) => setNuevaPassword(e.target.value)}
                                         placeholder="Dejar en blanco para no cambiarla"
-                                        className="w-full px-3 py-2 pr-10 rounded-lg text-sm border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full px-3 py-2 pr-10 rounded-lg text-sm border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                                     />
                                     <button
                                         type="button"
@@ -273,7 +277,7 @@ export const AdminProfileSidebar = () => {
                                         value={confirmarPassword}
                                         onChange={(e) => setConfirmarPassword(e.target.value)}
                                         placeholder="Repite la nueva contraseña"
-                                        className="w-full px-3 py-2 rounded-lg text-sm border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full px-3 py-2 rounded-lg text-sm border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                                     />
                                 </div>
                             )}
@@ -289,7 +293,7 @@ export const AdminProfileSidebar = () => {
                                         value={actualPassword}
                                         onChange={(e) => setActualPassword(e.target.value)}
                                         placeholder="Tu contraseña actual"
-                                        className="w-full px-3 py-2 pr-10 rounded-lg text-sm border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full px-3 py-2 pr-10 rounded-lg text-sm border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                                     />
                                     <button
                                         type="button"
@@ -322,7 +326,8 @@ export const AdminProfileSidebar = () => {
                             </div>
                         </form>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
         </div>
     )
