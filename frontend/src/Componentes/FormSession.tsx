@@ -3,6 +3,7 @@ import { Input } from "../components/ui/input"
 import { Label } from '../components/ui/label'
 import { useNavigate } from 'react-router-dom'
 import { GlobalCenter } from '../context/GlobalProvider'
+import Viscardo from "../assets/Font/ViscardoAndGuamzn.jpg"
 
 const FormSession = () => {
   const navigate = useNavigate()
@@ -58,9 +59,19 @@ const FormSession = () => {
               bg-gradient-to-r from-gray-900/80 to-gray-800/80 
               backdrop-blur-lg">
 
-      <h1 className="text-3xl font-bold text-center text-white mb-2">
-        Inicio de Sesión
-      </h1>
+      <div className="flex flex-col items-center justify-center mb-4">
+        <img 
+          src={Viscardo} 
+          alt="Logo Colegio" 
+          className="w-16 h-16 rounded-full border-2 border-indigo-400 object-cover shadow-lg mb-2"
+        />
+        <h1 className="text-2xl font-bold text-center text-white">
+          Inicio de Sesión
+        </h1>
+        <p className="text-xs text-indigo-300 font-semibold tracking-wide uppercase mt-0.5">
+          Colegio J. P. Vizcardo y Guzmán
+        </p>
+      </div>
 
       <p className="text-gray-300 text-center mb-6 text-sm">
         Ingresa con tus credenciales de Administrador para gestionar los libros
