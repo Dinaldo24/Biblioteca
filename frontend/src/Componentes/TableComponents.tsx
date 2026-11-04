@@ -89,8 +89,8 @@ const TableComponents = () => {
                 />
             </div>
 
-            <div className="border rounded-lg overflow-hidden bg-white shadow-sm">
-                <Table>
+            <div className="border rounded-xl overflow-x-auto bg-white shadow-sm">
+                <Table className="min-w-[650px]">
                     <TableHeader>
                         <TableRow className="bg-gray-50">
                             <TableHead className="w-16 font-bold">ID</TableHead>
