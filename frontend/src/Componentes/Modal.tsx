@@ -16,6 +16,7 @@ import { Label } from "../components/ui/label"
 import { MdEdit } from "react-icons/md"
 import type { PropsDetalle } from "../assets/Data"
 import { GlobalCenter } from "../context/GlobalProvider"
+import { ImageUploadField } from "./ImageUploadField"
 
 interface PropsBroks {
     UserChangue: PropsDetalle
@@ -100,7 +101,7 @@ export function DialogDemo({ UserChangue, onSuccess }: PropsBroks) {
                             Editar Libro #{UserChangue?.id}
                         </DialogTitle>
                         <DialogDescription>
-                            Modifica los campos del libro o actualiza el enlace de su portada.
+                            Modifica los campos del libro o sube una foto de la portada desde tu equipo o URL.
                         </DialogDescription>
                     </DialogHeader>
 
@@ -110,7 +111,7 @@ export function DialogDemo({ UserChangue, onSuccess }: PropsBroks) {
                         </div>
                     )}
 
-                    <FieldGroup className="space-y-3 my-4">
+                    <FieldGroup className="space-y-3.5 my-4">
                         <Field>
                             <Label htmlFor={`titulo-${UserChangue?.id}`}>Título del Libro</Label>
                             <Input
@@ -171,36 +172,12 @@ export function DialogDemo({ UserChangue, onSuccess }: PropsBroks) {
                             </Field>
                         </div>
 
-                        <Field>
-                            <Label htmlFor={`portada-${UserChangue?.id}`}>Enlace de la Portada (URL)</Label>
-                            <Input
-                                id={`portada-${UserChangue?.id}`}
-                                name="portada"
-                                value={form.portada}
-                                onChange={handleChange}
-                                placeholder="https://ejemplo.com/portada.jpg"
-                            />
-                            <p className="text-[11px] text-gray-500 mt-1">
-                                Pega aquí el enlace de la imagen o foto del libro.
-                            </p>
-                        </Field>
-
-                        {form.portada && (
-                            <div className="flex items-center gap-3 p-2 bg-slate-50 border rounded-lg">
-                                <img 
-                                    src={form.portada} 
-                                    alt="Vista previa" 
-                                    className="w-12 h-16 object-cover rounded shadow-sm border"
-                                    onError={(e) => {
-                                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400&q=80'
-                                    }}
-                                />
-                                <div className="text-xs text-gray-600">
-                                    <p className="font-semibold">Vista previa de la portada</p>
-                                    <p className="text-[10px] text-gray-400 truncate max-w-xs">{form.portada}</p>
-                                </div>
-                            </div>
-                        )}
+                        {/* Selector de Portada: Archivo Local o URL */}
+                        <ImageUploadField
+                            label="Portada del Libro"
+                            value={form.portada}
+                            onChange={(nuevaPortada) => setForm(prev => ({ ...prev, portada: nuevaPortada }))}
+                        />
                     </FieldGroup>
 
                     <DialogFooter className="mt-4 flex justify-end gap-2">

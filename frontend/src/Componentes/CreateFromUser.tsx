@@ -15,6 +15,7 @@ import { Input } from "../components/ui/input"
 import { Label } from "../components/ui/label"
 import { FaPlus } from "react-icons/fa"
 import { GlobalCenter } from "../context/GlobalProvider"
+import { ImageUploadField } from "./ImageUploadField"
 
 interface PropsCreate {
     onSuccess?: () => void
@@ -74,7 +75,7 @@ export function CreateDialogDemon({ onSuccess }: PropsCreate) {
                 setOpen(false)
                 if (onSuccess) onSuccess()
             } else {
-                setError('No se pudo guardar el libro.')
+                setError('Error al registrar el libro.')
             }
         } catch (err) {
             console.error(err)
@@ -87,16 +88,18 @@ export function CreateDialogDemon({ onSuccess }: PropsCreate) {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger render={
-                <Button className="bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-2 cursor-pointer mb-4">
+                <Button className="bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-2 cursor-pointer shadow-sm">
                     <FaPlus /> Subir Nuevo Libro
                 </Button>
             } />
-            <DialogContent className="sm:max-w-md bg-white">
+            <DialogContent className="sm:max-w-lg bg-white max-h-[90vh] overflow-y-auto">
                 <form onSubmit={handleSubmit}>
                     <DialogHeader>
-                        <DialogTitle className="text-xl font-bold text-gray-800">Subir Libro a la Biblioteca</DialogTitle>
+                        <DialogTitle className="text-xl font-bold text-gray-800">
+                            Añadir Nuevo Libro
+                        </DialogTitle>
                         <DialogDescription>
-                            Completa los datos del libro para guardarlo en la base de datos.
+                            Completa los datos del libro y sube la foto de su portada desde tu equipo o URL.
                         </DialogDescription>
                     </DialogHeader>
 
@@ -106,51 +109,40 @@ export function CreateDialogDemon({ onSuccess }: PropsCreate) {
                         </div>
                     )}
 
-                    <FieldGroup className="space-y-3 my-4">
+                    <FieldGroup className="space-y-3.5 my-4">
                         <Field>
-                            <Label htmlFor="titulo">Título *</Label>
+                            <Label htmlFor="titulo">Título del Libro *</Label>
                             <Input
                                 id="titulo"
                                 name="titulo"
                                 value={form.titulo}
                                 onChange={handleChange}
-                                placeholder="Ej: Cien años de soledad"
+                                placeholder="Ej: Atlas Regional del Perú - Cuzco"
                                 required
                             />
                         </Field>
 
                         <Field>
-                            <Label htmlFor="autor">Autor *</Label>
+                            <Label htmlFor="autor">Autor / Editorial *</Label>
                             <Input
                                 id="autor"
                                 name="autor"
                                 value={form.autor}
                                 onChange={handleChange}
-                                placeholder="Ej: Gabriel García Márquez"
+                                placeholder="Ej: Editorial Santillana / MINEDU"
                                 required
                             />
                         </Field>
 
                         <Field>
-                            <Label htmlFor="genero">Género *</Label>
+                            <Label htmlFor="genero">Área / Género / Colección *</Label>
                             <Input
                                 id="genero"
                                 name="genero"
                                 value={form.genero}
                                 onChange={handleChange}
-                                placeholder="Ej: Novela, Fantasía, Misterio"
+                                placeholder="Ej: Atlas y Geografía del Perú, CTA, Matemática..."
                                 required
-                            />
-                        </Field>
-
-                        <Field>
-                            <Label htmlFor="portada">URL de Portada / Imagen (Opcional)</Label>
-                            <Input
-                                id="portada"
-                                name="portada"
-                                value={form.portada}
-                                onChange={handleChange}
-                                placeholder="https://ejemplo.com/portada.jpg"
                             />
                         </Field>
 
@@ -179,11 +171,18 @@ export function CreateDialogDemon({ onSuccess }: PropsCreate) {
                                 />
                             </Field>
                         </div>
+
+                        {/* Selector de Portada: Archivo Local o URL */}
+                        <ImageUploadField
+                            label="Foto de Portada"
+                            value={form.portada}
+                            onChange={(nuevaPortada) => setForm(prev => ({ ...prev, portada: nuevaPortada }))}
+                        />
                     </FieldGroup>
 
                     <DialogFooter className="mt-4 flex justify-end gap-2">
                         <DialogClose render={<Button type="button" variant="outline">Cancelar</Button>} />
-                        <Button type="submit" disabled={cargando} className="bg-indigo-600 hover:bg-indigo-700 text-white">
+                        <Button type="submit" disabled={cargando} className="bg-indigo-600 hover:bg-indigo-700 text-white cursor-pointer">
                             {cargando ? 'Guardando...' : 'Guardar Libro'}
                         </Button>
                     </DialogFooter>
