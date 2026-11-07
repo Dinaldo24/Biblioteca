@@ -5,6 +5,8 @@ import com.biblioteca.dto.LoginRequest;
 import com.biblioteca.dto.LoginResponse;
 import com.biblioteca.model.Usuario;
 import com.biblioteca.repository.UsuarioRepository;
+import com.biblioteca.service.LoginRateLimiterService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,33 +29,60 @@ import java.util.UUID;
 public class AuthController {
 
     private final UsuarioRepository usuarioRepository;
+    private final LoginRateLimiterService rateLimiterService;
 
     @Autowired
-    public AuthController(UsuarioRepository usuarioRepository) {
+    public AuthController(UsuarioRepository usuarioRepository, LoginRateLimiterService rateLimiterService) {
         this.usuarioRepository = usuarioRepository;
+        this.rateLimiterService = rateLimiterService;
+    }
+
+    private String getClientIp(HttpServletRequest request) {
+        String xForwardedFor = request.getHeader("X-Forwarded-For");
+        if (xForwardedFor != null && !xForwardedFor.isBlank()) {
+            return xForwardedFor.split(",")[0].trim();
+        }
+        String xRealIp = request.getHeader("X-Real-IP");
+        if (xRealIp != null && !xRealIp.isBlank()) {
+            return xRealIp.trim();
+        }
+        return request.getRemoteAddr();
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest, HttpServletRequest request) {
+        String clientIp = getClientIp(request);
+
+        // 1. Verificar si la IP está bloqueada por exceso de intentos fallidos (Rate Limit)
+        long remainingLockoutSeconds = rateLimiterService.getLockoutRemainingSeconds(clientIp);
+        if (remainingLockoutSeconds > 0) {
+            long minutes = (remainingLockoutSeconds + 59) / 60;
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                    .body(new LoginResponse(false, "Demasiados intentos fallidos. Inténtalo de nuevo en " + minutes + " minuto(s)."));
+        }
+
         if (loginRequest.getUsername() == null || loginRequest.getPassword() == null) {
             return ResponseEntity.badRequest().body(new LoginResponse(false, "Usuario y contraseña requeridos"));
         }
 
-        Optional<Usuario> usuarioOpt = usuarioRepository.findByUsername(loginRequest.getUsername());
+        Optional<Usuario> usuarioOpt = usuarioRepository.findByUsername(loginRequest.getUsername().trim());
 
-        if (usuarioOpt.isEmpty()) {
+        // 2. Si el usuario no existe o la contraseña no coincide: mensaje unificado "Credenciales incorrectas"
+        if (usuarioOpt.isEmpty() || !usuarioOpt.get().getPassword().equals(loginRequest.getPassword())) {
+            boolean justLocked = rateLimiterService.recordFailedAttempt(clientIp);
+            if (justLocked) {
+                return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                        .body(new LoginResponse(false, "Demasiados intentos fallidos. Acceso bloqueado temporalmente por " 
+                                + LoginRateLimiterService.LOCKOUT_MINUTES + " minutos."));
+            }
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new LoginResponse(false, "Usuario no encontrado"));
+                    .body(new LoginResponse(false, "Credenciales incorrectas"));
         }
+
+        // 3. Inicio exitoso: reiniciar contador de fallos para esta IP
+        rateLimiterService.resetAttempts(clientIp);
 
         Usuario usuario = usuarioOpt.get();
-
-        if (!usuario.getPassword().equals(loginRequest.getPassword())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new LoginResponse(false, "Contraseña incorrecta"));
-        }
-
-        // Generar un token de sesión sencillo
         String token = "admin-token-" + UUID.randomUUID().toString();
 
         LoginResponse response = new LoginResponse(

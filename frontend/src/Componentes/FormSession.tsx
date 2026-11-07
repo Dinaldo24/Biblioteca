@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import { Input } from "../components/ui/input"
 import { Label } from '../components/ui/label'
 import { useNavigate } from 'react-router-dom'
@@ -9,13 +9,26 @@ const FormSession = () => {
   const navigate = useNavigate()
   const { authurl, setUser } = useContext(GlobalCenter)
 
-  const [username, setUsername] = useState('admin')
-  const [password, setPassword] = useState('123')
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [cargando, setCargando] = useState(false)
+  const [intentosFallidos, setIntentosFallidos] = useState(0)
+  const [bloqueadoSegundos, setBloqueadoSegundos] = useState(0)
+
+  // Temporizador para cuenta regresiva si se activa el rate limit
+  useEffect(() => {
+    if (bloqueadoSegundos <= 0) return
+    const timer = setInterval(() => {
+      setBloqueadoSegundos(prev => (prev > 0 ? prev - 1 : 0))
+    }, 1000)
+    return () => clearInterval(timer)
+  }, [bloqueadoSegundos])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (bloqueadoSegundos > 0) return
+
     setError(null)
     setCargando(true)
 
@@ -25,10 +38,13 @@ const FormSession = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify({ 
+          username: username.trim(), 
+          password 
+        })
       })
 
-      const data = await response.json()
+      const data = await response.json().catch(() => ({}))
 
       if (response.ok && data.exito) {
         // Guardar sesión
@@ -41,9 +57,22 @@ const FormSession = () => {
         }
         localStorage.setItem('usuario_biblioteca', JSON.stringify(sessionData))
         setUser(sessionData)
+        setIntentosFallidos(0)
+        setBloqueadoSegundos(0)
         navigate('/adminZone/libros')
+      } else if (response.status === 429) {
+        // Rate limit alcanzado en el backend
+        setBloqueadoSegundos(300) // 5 minutos
+        setError(data.mensaje || 'Demasiados intentos fallidos. Acceso bloqueado temporalmente por seguridad.')
       } else {
-        setError(data.mensaje || 'Credenciales incorrectas')
+        const nuevosFallos = intentosFallidos + 1
+        setIntentosFallidos(nuevosFallos)
+        if (nuevosFallos >= 5) {
+          setBloqueadoSegundos(60) // Cooldown de 60 segundos
+          setError('Demasiados intentos consecutivos. Espera 60 segundos antes de volver a intentar.')
+        } else {
+          setError(data.mensaje || 'Credenciales incorrectas')
+        }
       }
     } catch (err) {
       console.error(err)
@@ -90,9 +119,10 @@ const FormSession = () => {
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            placeholder="admin"
+            placeholder="Usuario"
             required
-            className="w-full border border-gray-600 bg-gray-950/50 text-white rounded-md p-2 focus:border-indigo-400"
+            disabled={bloqueadoSegundos > 0}
+            className="w-full border border-gray-600 bg-gray-950/50 text-white rounded-md p-2 focus:border-indigo-400 disabled:opacity-50"
           />
         </div>
 
@@ -104,21 +134,26 @@ const FormSession = () => {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="••••••••"
             required
-            className="w-full border border-gray-600 bg-gray-950/50 text-white rounded-md p-2 focus:border-indigo-400"
+            disabled={bloqueadoSegundos > 0}
+            className="w-full border border-gray-600 bg-gray-950/50 text-white rounded-md p-2 focus:border-indigo-400 disabled:opacity-50"
           />
         </div>
 
         <button
           type="submit"
-          disabled={cargando}
+          disabled={cargando || bloqueadoSegundos > 0}
           className="w-full cursor-pointer py-2.5 rounded-md font-bold text-white
-                     bg-indigo-600 hover:bg-indigo-500 disabled:bg-gray-600
+                     bg-indigo-600 hover:bg-indigo-500 disabled:bg-gray-600 disabled:cursor-not-allowed
                      transition-colors shadow-lg">
-          {cargando ? 'Iniciando sesión...' : 'Entrar al Panel de Administración'}
+          {bloqueadoSegundos > 0
+            ? `Acceso temporalmente bloqueado (${bloqueadoSegundos}s)`
+            : cargando
+            ? 'Iniciando sesión...'
+            : 'Entrar al Panel de Administración'}
         </button>
       </form>
 
-      <div className="text-center mt-4">
+      <div className="text-center mt-6">
         <button
           type="button"
           onClick={() => navigate('/')}
