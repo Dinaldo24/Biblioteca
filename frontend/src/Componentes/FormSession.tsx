@@ -118,10 +118,6 @@ const FormSession = () => {
         </button>
       </form>
 
-      <div className="mt-6 p-3 bg-indigo-950/40 border border-indigo-700/50 rounded-lg text-xs text-indigo-200 text-center">
-        💡 <strong>Credenciales por defecto:</strong> Usuario: <code className="bg-black/40 px-1 py-0.5 rounded">admin</code> | Clave: <code className="bg-black/40 px-1 py-0.5 rounded">123</code>
-      </div>
-
       <div className="text-center mt-4">
         <button
           type="button"
