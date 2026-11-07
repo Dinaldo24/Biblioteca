@@ -61,7 +61,7 @@ export const AdminProfileSidebar = () => {
         try {
             const resp = await fetch(`${authurl}/editar-perfil`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', ...(user?.token ? { 'Authorization': Bearer  } : {}) },
                 body: JSON.stringify({
                     currentUsername: user?.username || 'admin',
                     newUsername: nuevoUsername.trim(),

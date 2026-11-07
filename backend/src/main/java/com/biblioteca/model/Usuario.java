@@ -1,5 +1,6 @@
 package com.biblioteca.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -18,6 +19,8 @@ public class Usuario {
     @Column(nullable = false, unique = true, length = 100)
     private String username;
 
+    // WRITE_ONLY garantiza que la contraseña se puede recibir en peticiones pero JAMAS se serializa en respuestas JSON
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(nullable = false, length = 100)
     private String password;
 

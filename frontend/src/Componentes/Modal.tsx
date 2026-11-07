@@ -24,7 +24,7 @@ interface PropsBroks {
 }
 
 export function DialogDemo({ UserChangue, onSuccess }: PropsBroks) {
-    const { backurl } = useContext(GlobalCenter)
+    const { backurl, user } = useContext(GlobalCenter)
     const [open, setOpen] = useState(false)
     const [cargando, setCargando] = useState(false)
     const [error, setError] = useState<string | null>(null)
@@ -65,10 +65,12 @@ export function DialogDemo({ UserChangue, onSuccess }: PropsBroks) {
         setCargando(true)
 
         try {
+            const token = user?.token || JSON.parse(localStorage.getItem("usuario_biblioteca") || "{}")?.token
             const resp = await fetch(`${backurl}/${UserChangue.id}`, {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    ...(token ? { "Authorization": `Bearer ${token}` } : {}),
                 },
                 body: JSON.stringify(form)
             })

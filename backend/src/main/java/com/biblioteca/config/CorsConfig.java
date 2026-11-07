@@ -14,9 +14,17 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOriginPatterns("*")
+                        .allowedOriginPatterns(
+                                "https://biblioteca-juanpablo.vercel.app",
+                                "https://biblioteca-doy3.vercel.app",
+                                "https://*.vercel.app",
+                                "http://localhost:5173",
+                                "http://localhost:3000",
+                                "http://localhost:3001"
+                        )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH")
-                        .allowedHeaders("*")
+                        .allowedHeaders("Authorization", "Content-Type", "X-Requested-With", "Accept")
+                        .exposedHeaders("Authorization")
                         .allowCredentials(false);
             }
         };

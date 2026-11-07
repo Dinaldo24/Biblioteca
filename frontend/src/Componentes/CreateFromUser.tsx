@@ -55,10 +55,13 @@ export function CreateDialogDemon({ onSuccess }: PropsCreate) {
 
         setCargando(true)
         try {
+            const sesion = localStorage.getItem('usuario_biblioteca')
+            const token = sesion ? JSON.parse(sesion)?.token : ''
             const resp = await fetch(backurl, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': Bearer  } : {})
                 },
                 body: JSON.stringify(form)
             })

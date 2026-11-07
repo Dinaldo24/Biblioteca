@@ -14,7 +14,7 @@ const ProtecterRouter = ({ children }: Props) => {
       const sesion = localStorage.getItem('usuario_biblioteca')
       if (sesion) {
         const parsed = JSON.parse(sesion)
-        if (parsed.rol === 'ADMIN' || parsed.username === 'admin') {
+        if (parsed.token && (parsed.rol === 'ADMIN' || parsed.username === 'admin')) {
           setAutorizado(true)
           return
         }

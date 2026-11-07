@@ -20,15 +20,19 @@ interface PropsBroks {
 }
 
 export function DeleteDemon({ UserChangue, onSuccess }: PropsBroks) {
-    const { backurl } = useContext(GlobalCenter)
+    const { backurl, user } = useContext(GlobalCenter)
     const [open, setOpen] = useState(false)
     const [eliminando, setEliminando] = useState(false)
 
     const handleDelete = async () => {
         setEliminando(true)
         try {
+            const token = user?.token || JSON.parse(localStorage.getItem('usuario_biblioteca') || '{}')?.token
             const resp = await fetch(`${backurl}/${UserChangue.id}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: {
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                }
             })
             if (resp.ok) {
                 setOpen(false)

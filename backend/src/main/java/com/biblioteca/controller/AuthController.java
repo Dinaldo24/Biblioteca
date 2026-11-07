@@ -5,12 +5,13 @@ import com.biblioteca.dto.LoginRequest;
 import com.biblioteca.dto.LoginResponse;
 import com.biblioteca.model.Usuario;
 import com.biblioteca.repository.UsuarioRepository;
+import com.biblioteca.service.JwtSecurityService;
 import com.biblioteca.service.LoginRateLimiterService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,20 +22,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "*")
 public class AuthController {
 
     private final UsuarioRepository usuarioRepository;
     private final LoginRateLimiterService rateLimiterService;
+    private final JwtSecurityService jwtSecurityService;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public AuthController(UsuarioRepository usuarioRepository, LoginRateLimiterService rateLimiterService) {
+    public AuthController(
+            UsuarioRepository usuarioRepository,
+            LoginRateLimiterService rateLimiterService,
+            JwtSecurityService jwtSecurityService,
+            PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
         this.rateLimiterService = rateLimiterService;
+        this.jwtSecurityService = jwtSecurityService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     private String getClientIp(HttpServletRequest request) {
@@ -49,11 +56,39 @@ public class AuthController {
         return request.getRemoteAddr();
     }
 
+    private String extractBearerToken(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7).trim();
+        }
+        return null;
+    }
+
+    private boolean verifyPassword(Usuario usuario, String rawPassword) {
+        if (usuario.getPassword() == null || rawPassword == null) {
+            return false;
+        }
+
+        // 1. Verificar si ya esta hasheado con BCrypt
+        if (passwordEncoder.matches(rawPassword, usuario.getPassword())) {
+            return true;
+        }
+
+        // 2. Transición suave: si estaba en texto plano, migrar inmediatamente a hash BCrypt
+        if (usuario.getPassword().equals(rawPassword)) {
+            usuario.setPassword(passwordEncoder.encode(rawPassword));
+            usuarioRepository.save(usuario);
+            return true;
+        }
+
+        return false;
+    }
+
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest, HttpServletRequest request) {
         String clientIp = getClientIp(request);
 
-        // 1. Verificar si la IP está bloqueada por exceso de intentos fallidos (Rate Limit)
+        // 1. Rate Limit
         long remainingLockoutSeconds = rateLimiterService.getLockoutRemainingSeconds(clientIp);
         if (remainingLockoutSeconds > 0) {
             long minutes = (remainingLockoutSeconds + 59) / 60;
@@ -67,23 +102,22 @@ public class AuthController {
 
         Optional<Usuario> usuarioOpt = usuarioRepository.findByUsername(loginRequest.getUsername().trim());
 
-        // 2. Si el usuario no existe o la contraseña no coincide: mensaje unificado "Credenciales incorrectas"
-        if (usuarioOpt.isEmpty() || !usuarioOpt.get().getPassword().equals(loginRequest.getPassword())) {
+        if (usuarioOpt.isEmpty() || !verifyPassword(usuarioOpt.get(), loginRequest.getPassword())) {
             boolean justLocked = rateLimiterService.recordFailedAttempt(clientIp);
             if (justLocked) {
                 return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
-                        .body(new LoginResponse(false, "Demasiados intentos fallidos. Acceso bloqueado temporalmente por " 
+                        .body(new LoginResponse(false, "Demasiados intentos fallidos. Acceso bloqueado temporalmente por "
                                 + LoginRateLimiterService.LOCKOUT_MINUTES + " minutos."));
             }
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new LoginResponse(false, "Credenciales incorrectas"));
         }
 
-        // 3. Inicio exitoso: reiniciar contador de fallos para esta IP
         rateLimiterService.resetAttempts(clientIp);
-
         Usuario usuario = usuarioOpt.get();
-        String token = "admin-token-" + UUID.randomUUID().toString();
+
+        // 2. Generar token JWT firmado
+        String token = jwtSecurityService.generateToken(usuario.getUsername(), usuario.getRol());
 
         LoginResponse response = new LoginResponse(
                 true,
@@ -99,7 +133,7 @@ public class AuthController {
     }
 
     @PostMapping("/cambiar-password")
-    public ResponseEntity<Map<String, Object>> cambiarPassword(@RequestBody CambiarPasswordRequest request) {
+    public ResponseEntity<Map<String, Object>> cambiarPassword(@RequestBody CambiarPasswordRequest request, HttpServletRequest httpRequest) {
         Map<String, Object> resp = new HashMap<>();
 
         if (request.getUsername() == null || request.getActualPassword() == null || request.getNuevaPassword() == null) {
@@ -116,7 +150,7 @@ public class AuthController {
         }
 
         Usuario usuario = usuarioOpt.get();
-        if (!usuario.getPassword().equals(request.getActualPassword())) {
+        if (!verifyPassword(usuario, request.getActualPassword())) {
             resp.put("exito", false);
             resp.put("mensaje", "La contraseña actual no es correcta");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resp);
@@ -128,7 +162,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resp);
         }
 
-        usuario.setPassword(request.getNuevaPassword().trim());
+        usuario.setPassword(passwordEncoder.encode(request.getNuevaPassword().trim()));
         usuarioRepository.save(usuario);
 
         resp.put("exito", true);
@@ -159,7 +193,7 @@ public class AuthController {
         }
 
         Usuario usuario = usuarioOpt.get();
-        if (!usuario.getPassword().equals(actualPassword)) {
+        if (!verifyPassword(usuario, actualPassword)) {
             resp.put("exito", false);
             resp.put("mensaje", "La contraseña actual no es correcta");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resp);
@@ -184,7 +218,7 @@ public class AuthController {
                 resp.put("mensaje", "La nueva contraseña debe tener al menos 3 caracteres");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resp);
             }
-            usuario.setPassword(nuevaPassword.trim());
+            usuario.setPassword(passwordEncoder.encode(nuevaPassword.trim()));
         }
 
         usuarioRepository.save(usuario);
@@ -196,8 +230,19 @@ public class AuthController {
         return ResponseEntity.ok(resp);
     }
 
+    /**
+     * Endpoint protegido: solo administradores autenticados con JWT valido pueden listar usuarios.
+     * La contraseña NUNCA es visible en JSON gracias a @JsonProperty(WRITE_ONLY) en Usuario.java.
+     */
     @GetMapping("/usuarios")
-    public ResponseEntity<List<Usuario>> listarUsuarios() {
+    public ResponseEntity<?> listarUsuarios(HttpServletRequest request) {
+        String token = extractBearerToken(request);
+        if (!jwtSecurityService.validateToken(token) || !"ADMIN".equalsIgnoreCase(jwtSecurityService.extractRole(token))) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Acceso denegado: se requiere autorización de Administrador");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+        }
+
         return ResponseEntity.ok(usuarioRepository.findAll());
     }
 }
